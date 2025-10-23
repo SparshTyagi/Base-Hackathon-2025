@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { SwearJarDatabase, Group, Member, Rule, Violation, Vote, VoteResponse } from './database.js';
+import { SwearJarDatabase, Group, Member, Rule, Violation, Vote, VoteResponse } from './database-simple.js';
 import { depositBond, type JarConfig, type Address } from './jar.js';
 import { z } from 'zod';
 
@@ -136,7 +136,7 @@ export class GroupService {
     // Mark violation as penalty applied
     this.db.markViolationPenaltyApplied(violationId, result.hash);
 
-    return result;
+    return { txHash: result.hash, block: result.block };
   }
 
   async getGroupDashboard(groupId: string): Promise<{

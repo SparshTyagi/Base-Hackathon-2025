@@ -10,16 +10,20 @@ import { Avatar } from "@/components/avatar";
 import { MemberAdder } from "./memberadder";
 import { uid, clamp, formatEth } from "@/lib/utils";
 import { Piggybank, Member, Rule, RuleType } from "@/lib/types";
+import { useBackendIntegration } from "@/lib/hooks/useBackendIntegration";
 
 interface CreateProps {
   onCancel: () => void;
   onCreate: (p: Piggybank) => void;
+  userAddress?: string;
 }
 
 export const CreatePiggybank: React.FC<CreateProps> = ({
   onCancel,
   onCreate,
+  userAddress,
 }) => {
+  const backend = useBackendIntegration({ userAddress });
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("Be nice, post daily");
   const [entry, setEntry] = useState(0.01);
@@ -65,7 +69,7 @@ export const CreatePiggybank: React.FC<CreateProps> = ({
 
   const canCreate = name.trim().length >= 3 && members.length >= 2 && rules.length >= 1;
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const p: Piggybank = {
       id: uid(),
       name,
@@ -78,7 +82,18 @@ export const CreatePiggybank: React.FC<CreateProps> = ({
       members,
       infractions: [],
     };
-    onCreate(p);
+
+    try {
+      if (userAddress && backend.createGroup) {
+        // Create group in backend
+        await backend.createGroup(p, userAddress);
+      }
+      onCreate(p);
+    } catch (error) {
+      console.error('Failed to create group:', error);
+      // Still create locally for demo purposes
+      onCreate(p);
+    }
   };
 
   return (

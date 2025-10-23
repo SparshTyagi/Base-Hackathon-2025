@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { SwearJarDatabase } from '../database.js';
+import { SwearJarDatabase } from '../database-simple.js';
 import { GroupService, CreateGroupRequest, AddMemberRequest, CreateRuleRequest, ReportViolationRequest } from '../groupService.js';
 import { type JarConfig } from '../jar.js';
 

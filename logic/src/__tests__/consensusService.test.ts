@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { SwearJarDatabase } from '../database.js';
+import { SwearJarDatabase } from '../database-simple.js';
 import { GroupService } from '../groupService.js';
 import { NotificationService } from '../notificationService.js';
 import { ConsensusService } from '../consensusService.js';

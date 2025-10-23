@@ -17,6 +17,8 @@ import { PiggyCard } from "@/layout/piggycard";
 import { CreatePiggybank } from "@/layout/createpiggybank";
 import { PiggyDetail } from "@/layout/piggydetail";
 import { Piggybank, Infraction, Member, Rule, RuleType } from "@/lib/types";
+import { useBackendIntegration } from "@/lib/hooks/useBackendIntegration";
+import { WalletConnection } from "@/components/wallet-connection";
 
 
 
@@ -854,10 +856,27 @@ type View = "dashboard" | "create" | "detail";
 export default function PiggybankMiniApp() {
   const [view, setView] = useState<View>("dashboard");
   const [connected, setConnected] = useState(false);
+  const [userAddress, setUserAddress] = useState<string | undefined>();
   const [piggies, setPiggies] = useState<Piggybank[]>([seedPiggybank()]);
   const [active, setActive] = useState<Piggybank | null>(piggies[0]);
+  
+  // Backend integration
+  const backend = useBackendIntegration({ 
+    userAddress,
+    groupId: active?.id 
+  });
 
   const totalPot = useMemo(() => piggies.reduce((sum, p) => sum + p.potEth, 0), [piggies]);
+
+  const handleWalletConnect = (address: string) => {
+    setUserAddress(address);
+    setConnected(true);
+  };
+
+  const handleWalletDisconnect = () => {
+    setUserAddress(undefined);
+    setConnected(false);
+  };
 
   useEffect(() => {
     // Accessibility: focus on view change
@@ -873,6 +892,22 @@ export default function PiggybankMiniApp() {
     color: "var(--color-text)",
   }}
 >
+      {/* Header with wallet connection */}
+      <div className="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-gray-200">
+        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-sm tracking-wide text-gray-500">Mini App on Base</div>
+            <div className="font-extrabold text-lg text-gray-900">Piggyfi</div>
+          </div>
+          <WalletConnection
+            onConnect={handleWalletConnect}
+            onDisconnect={handleWalletDisconnect}
+            connected={connected}
+            userAddress={userAddress}
+          />
+        </div>
+      </div>
+
       {/* Page container */}
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
         {view === "dashboard" && (
@@ -925,6 +960,7 @@ export default function PiggybankMiniApp() {
                 setActive(p);
                 setView("detail");
               }}
+              userAddress={userAddress}
             />
           </>
         )}
