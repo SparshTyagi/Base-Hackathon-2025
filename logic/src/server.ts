@@ -26,7 +26,7 @@ const PORT = parseInt(process.env.PORT || "8080", 10);
 
 const cfg: JarConfig = {
   rpcUrl: process.env.RPC_URL || "https://sepolia.base.org",
-  contract: (process.env.CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000") as `0x${string}`
+  contract: (process.env.CONTRACT_ADDRESS || "0x73183E071A52C76921CcAfB037400BeC1f635E4B") as `0x${string}`
 };
 
 const DEFAULT_KEY = process.env.DEFAULT_PRIVATE_KEY; // optional: used by /deposit and /withdraw if present

@@ -10,7 +10,7 @@ const app = Fastify({ logger: true });
 const PORT = parseInt(process.env.PORT || "8080", 10);
 const cfg = {
     rpcUrl: process.env.RPC_URL || "https://sepolia.base.org",
-    contract: (process.env.CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000")
+    contract: (process.env.CONTRACT_ADDRESS || "0x73183E071A52C76921CcAfB037400BeC1f635E4B")
 };
 const DEFAULT_KEY = process.env.DEFAULT_PRIVATE_KEY; // optional: used by /deposit and /withdraw if present
 // Initialize database and services
