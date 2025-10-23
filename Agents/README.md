@@ -78,7 +78,7 @@ DATABASE_PATH="violations.db"
 
 # LLM Model Selection (via OpenRouter)
 DEFAULT_MODEL="nvidia/nemotron-nano-9b-v2:free"
-FALLBACK_MODELS="google/gemini-pro"
+FALLBACK_MODELS="openai/gpt-oss-20b:free"
 
 # LLM Request Behavior
 LLM_REQUEST_TIMEOUT_S="45"
@@ -425,7 +425,7 @@ OPENROUTER_API_KEY="your_key"
 # Optional (with defaults)
 DATABASE_PATH="violations.db"
 DEFAULT_MODEL="nvidia/nemotron-nano-9b-v2:free"
-FALLBACK_MODELS="google/gemini-pro"
+FALLBACK_MODELS="openai/gpt-oss-20b:free"
 LLM_REQUEST_TIMEOUT_S="45"
 LLM_ATTEMPTS_PER_MODEL="3"
 LLM_RETRY_DELAYS_S="15,20"
