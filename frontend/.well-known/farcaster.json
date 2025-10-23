@@ -1,0 +1,17 @@
+{
+  "accountAssociation": {
+    "header": "X-Farcaster-Account-Association",
+    "payload": "eyJ1aWQiOiIxMjM0NTY3ODkwIiwidGltZXN0YW1wIjoiMTcwMDAwMDAwMCIsIm5ldHdvcmsiOiJiYXNlIn0=",
+    "signature": "0x1234567890abcdef"
+  },
+  "frame": {
+    "version": "next",
+    "name": "Swear Jar - Social Accountability",
+    "iconUrl": "https://your-domain.com/icon.png",
+    "homeUrl": "https://your-domain.com/",
+    "splashImageUrl": "https://your-domain.com/splash.png",
+    "splashBackgroundColor": "#ffffff",
+    "primaryCategory": "social",
+    "tags": ["base", "piggybank", "miniapp", "social", "accountability"]
+  }
+}

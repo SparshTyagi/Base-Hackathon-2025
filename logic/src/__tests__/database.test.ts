@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { SwearJarDatabase, Group, Member, Rule, Violation } from '../database.js';
+import { SwearJarDatabase, Group, Member, Rule, Violation } from '../database-simple.js';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('SwearJarDatabase', () => {

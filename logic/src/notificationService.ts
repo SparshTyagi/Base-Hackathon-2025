@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws';
-import { Violation, Vote } from './database.js';
+import { Violation, Vote } from './database-simple.js';
 
 export interface NotificationMessage {
   type: 'violation' | 'penalty_applied' | 'vote_created' | 'vote_ended' | 'member_joined' | 'vote_result';

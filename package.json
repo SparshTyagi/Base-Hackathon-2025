@@ -1,31 +1,34 @@
 {
-  "name": "piggyfi",
-  "version": "0.1.0",
-  "private": true,
+  "name": "swearjar-smart-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for the Swear Jar application",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "eslint"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network baseMainnet",
+    "test:contract": "hardhat run scripts/test-contract.ts",
+    "verify:sepolia": "hardhat verify --network baseSepolia",
+    "verify:mainnet": "hardhat verify --network baseMainnet"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "base",
+    "smart-contracts"
+  ],
+  "author": "Swear Jar Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@types/node": "^20.19.23",
+    "dotenv": "^16.6.1",
+    "hardhat": "^2.26.3",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "class-variance-authority": "^0.7.1",
-    "framer-motion": "^12.23.24",
-    "lucide-react": "^0.546.0",
-    "next": "15.5.6",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "tailwind-merge": "^3.3.1"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "ethers": "^6.11.1"
   }
 }

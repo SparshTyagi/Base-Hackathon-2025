@@ -25,9 +25,9 @@ export function getJarSigner(cfg: JarConfig, privKey: string) {
 export async function readState(cfg: JarConfig, user: Address) {
   const jar = getJarReader(cfg);
   const [bondWei, potWei, nonce] = await Promise.all([
-    jar.bond(user) as Promise<bigint>,
-    jar.potBalance() as Promise<bigint>,
-    jar.nonces(user) as Promise<bigint>,
+    jar.getBond(user) as Promise<bigint>,
+    jar.getPotBalance() as Promise<bigint>,
+    jar.getNonce(user) as Promise<bigint>,
   ]);
   return {
     bondWei,

@@ -8,7 +8,7 @@ import {
   isAddress,
   type JarConfig
 } from "./jar.js";
-import { SwearJarDatabase } from "./database.js";
+import { SwearJarDatabase } from "./database-simple.js";
 import { 
   GroupService, 
   CreateGroupRequest, 
@@ -26,7 +26,7 @@ const PORT = parseInt(process.env.PORT || "8080", 10);
 
 const cfg: JarConfig = {
   rpcUrl: process.env.RPC_URL || "https://sepolia.base.org",
-  contract: (process.env.CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000") as `0x${string}`
+  contract: (process.env.CONTRACT_ADDRESS || "0x73183E071A52C76921CcAfB037400BeC1f635E4B") as `0x${string}`
 };
 
 const DEFAULT_KEY = process.env.DEFAULT_PRIVATE_KEY; // optional: used by /deposit and /withdraw if present
@@ -38,15 +38,11 @@ const notificationService = new NotificationService();
 const consensusService = new ConsensusService(db, groupService, notificationService, cfg);
 
 // Register plugins
-await app.register(import('@fastify/cors'), {
+app.register(import('@fastify/cors'), {
   origin: true
 });
 
-await app.register(import('@fastify/websocket'), {
-  options: {
-    maxPayload: 1048576, // 1MB
-  }
-});
+app.register(import('@fastify/websocket'));
 
 // WebSocket endpoint for real-time notifications
 app.register(async function (fastify) {
@@ -120,7 +116,7 @@ app.post("/groups", async (req, res) => {
     const group = await groupService.createGroup(request);
     return { ok: true, group };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -130,7 +126,7 @@ app.get("/groups/:id", async (req, res) => {
     const dashboard = await groupService.getGroupDashboard(id);
     return { ok: true, dashboard };
   } catch (error) {
-    return res.status(404).send({ ok: false, error: error.message });
+    return res.status(404).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -141,7 +137,7 @@ app.post("/groups/:id/members", async (req, res) => {
     const member = await groupService.addMember(request);
     return { ok: true, member };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -152,7 +148,7 @@ app.post("/groups/:id/rules", async (req, res) => {
     const rule = await groupService.createRule(request);
     return { ok: true, rule };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -167,7 +163,7 @@ app.post("/violations", async (req, res) => {
     
     return { ok: true, violation };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -188,7 +184,7 @@ app.post("/violations/:id/apply-penalty", async (req, res) => {
     
     return { ok: true, tx: result };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -201,7 +197,7 @@ app.get("/users/:address/dashboard", async (req, res) => {
     const dashboard = await groupService.getUserDashboard(address);
     return { ok: true, dashboard };
   } catch (error) {
-    return res.status(500).send({ ok: false, error: error.message });
+    return res.status(500).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -222,7 +218,7 @@ app.post("/groups/:id/votes", async (req, res) => {
     const vote = await groupService.createVote(id, proposalType, proposalData, proposerAddress, expiresInHours);
     return { ok: true, vote };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -247,7 +243,7 @@ app.post("/votes/:id/submit", async (req, res) => {
     
     return { ok: true, voteResponse, voteResult };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -259,7 +255,7 @@ app.get("/votes/:id/status", async (req, res) => {
     const voteResult = await consensusService.getVoteStatus(id);
     return { ok: true, voteResult };
   } catch (error) {
-    return res.status(404).send({ ok: false, error: error.message });
+    return res.status(404).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -270,7 +266,7 @@ app.get("/groups/:id/votes", async (req, res) => {
     const votes = await consensusService.getGroupVotes(id);
     return { ok: true, votes };
   } catch (error) {
-    return res.status(404).send({ ok: false, error: error.message });
+    return res.status(404).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -293,7 +289,7 @@ app.post("/groups/:id/votes/pot-distribution", async (req, res) => {
     
     return { ok: true, vote };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -313,7 +309,7 @@ app.post("/groups/:id/votes/build-execution", async (req, res) => {
     const calldata = consensusService.buildPotDistributionCalldata(id, { recipient, amount, reason: '' });
     return { ok: true, calldata };
   } catch (error) {
-    return res.status(400).send({ ok: false, error: error.message });
+    return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
   }
 });
 
