@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "action": "get_all_violations",
+  "timestamp": "2025-10-23T20:11:06.893041",
+  "violations": [
+    {
+      "id": 1,
+      "post_id": "0xc9f8a7d8f42d48760abb288bd0d6d4c14a2f8764",
+      "author_id": "1398613",
+      "rule_violated": "Used forbidden word (kinda/dunno)",
+      "timestamp": "2025-10-23T17:05:46.000Z",
+      "content_snippet": "Kinda kinda kinda kinda"
+    },
+    {
+      "id": 2,
+      "post_id": "0x6ad3969d91a0e8c5e410d0897d410efde481a759",
+      "author_id": "1398613",
+      "rule_violated": "Used forbidden word (kinda/dunno)",
+      "timestamp": "2025-10-23T12:17:20.000Z",
+      "content_snippet": "This is kinda cool"
+    }
+  ],
+  "violations_by_user": {
+    "1398613": [
+      {
+        "id": 1,
+        "post_id": "0xc9f8a7d8f42d48760abb288bd0d6d4c14a2f8764",
+        "author_id": "1398613",
+        "rule_violated": "Used forbidden word (kinda/dunno)",
+        "timestamp": "2025-10-23T17:05:46.000Z",
+        "content_snippet": "Kinda kinda kinda kinda"
+      },
+      {
+        "id": 2,
+        "post_id": "0x6ad3969d91a0e8c5e410d0897d410efde481a759",
+        "author_id": "1398613",
+        "rule_violated": "Used forbidden word (kinda/dunno)",
+        "timestamp": "2025-10-23T12:17:20.000Z",
+        "content_snippet": "This is kinda cool"
+      }
+    ]
+  },
+  "total_violations": 2,
+  "total_users": 1
+}

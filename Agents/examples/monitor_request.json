@@ -1,0 +1,21 @@
+{
+  "action": "monitor",
+  "users": [
+    {
+      "user_id": "1398613",
+      "forbidden_words": ["kinda", "dunno", "literally"],
+      "llm_rules": []
+    },
+    {
+      "user_id": "194",
+      "forbidden_words": [],
+      "llm_rules": [
+        {
+          "name": "Promotional Content",
+          "description": "Detect posts that are overly promotional or advertising products/services"
+        }
+      ]
+    }
+  ],
+  "days": 7
+}

@@ -1,0 +1,10 @@
+{
+  "action": "configure_users",
+  "users": [
+    {
+      "user_id": "1398613",
+      "forbidden_words": ["kinda", "dunno", "literally"],
+      "llm_rules": []
+    }
+  ]
+}
