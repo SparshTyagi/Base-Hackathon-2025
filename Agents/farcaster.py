@@ -6,6 +6,10 @@ import time
 from datetime import datetime, timedelta
 import requests
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def get_fast_model():
     """Returns the default model for the agent."""
