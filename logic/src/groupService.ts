@@ -225,4 +225,8 @@ export class GroupService {
     this.db.submitVoteResponse(voteResponse);
     return voteResponse;
   }
+
+  async getAllGroups(): Promise<Group[]> {
+    return this.db.getAllGroups();
+  }
 }

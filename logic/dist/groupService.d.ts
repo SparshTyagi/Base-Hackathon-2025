@@ -97,4 +97,5 @@ export declare class GroupService {
     private getRecentViolations;
     createVote(groupId: string, proposalType: string, proposalData: any, proposerAddress: string, expiresInHours?: number): Promise<Vote>;
     submitVote(voteId: string, voterAddress: string, response: 'yes' | 'no'): Promise<VoteResponse>;
+    getAllGroups(): Promise<Group[]>;
 }

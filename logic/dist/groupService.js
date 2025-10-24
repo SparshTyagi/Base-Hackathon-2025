@@ -175,4 +175,7 @@ export class GroupService {
         this.db.submitVoteResponse(voteResponse);
         return voteResponse;
     }
+    async getAllGroups() {
+        return this.db.getAllGroups();
+    }
 }
