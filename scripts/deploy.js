@@ -51,7 +51,8 @@ async function main() {
   
   // Save deployment info
   const deploymentFile = path.join(deploymentsDir, `${network.name}-${network.chainId}.json`);
-  fs.writeFileSync(deploymentFile, JSON.stringify(deploymentInfo, null, 2));
+  fs.writeFileSync(deploymentFile, JSON.stringify(deploymentInfo, (key, value) =>
+    typeof value === 'bigint' ? value.toString() : value, 2));
   
   console.log("📄 Deployment info saved to:", deploymentFile);
   

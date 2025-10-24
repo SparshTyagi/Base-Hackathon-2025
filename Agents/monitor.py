@@ -1,4 +1,6 @@
 """Main monitoring orchestrator for Farcaster content."""
+import os
+import requests
 from typing import List, Dict
 from core.base_agent import BaseAgent
 from core.settings import get_openrouter_api_key
@@ -22,7 +24,11 @@ class FarcasterMonitor:
         self.farcaster_api = FarcasterAPI()
         self.rule_engine = RuleEngine()
         
+        # Backend webhook configuration
+        self.backend_webhook_url = os.getenv('BACKEND_WEBHOOK_URL', 'http://localhost:8080/api/violations/webhook')
+        
         print(f"Monitor initialized with model: {self.agent.model}")
+        print(f"Backend webhook URL: {self.backend_webhook_url}")
     
     def add_user_with_rules(self, user_id: str, forbidden_words: List[str] = None,
                            llm_rules: List[Dict[str, str]] = None) -> None:
@@ -49,6 +55,76 @@ class FarcasterMonitor:
                 ))
         
         self.rule_engine.add_user_rules(user_id, rules)
+    
+    def report_violation_to_backend(self, group_id: str, member_fid: str, rule_id: str, 
+                                  violation_type: str, evidence: str) -> bool:
+        """Report a violation to the backend webhook.
+        
+        Args:
+            group_id: Group ID where violation occurred
+            member_fid: Farcaster FID of the member who violated
+            rule_id: ID of the rule that was violated
+            violation_type: Type of violation (e.g., 'swearing', 'negativity')
+            evidence: The content that violated the rule
+            
+        Returns:
+            True if successfully reported, False otherwise
+        """
+        try:
+            payload = {
+                'groupId': group_id,
+                'memberFid': member_fid,
+                'ruleId': rule_id,
+                'violationType': violation_type,
+                'evidence': evidence
+            }
+            
+            response = requests.post(
+                self.backend_webhook_url,
+                json=payload,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                print(f"✅ Violation reported to backend: {violation_type} by FID {member_fid}")
+                return True
+            else:
+                print(f"❌ Failed to report violation: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error reporting violation to backend: {e}")
+            return False
+    
+    def get_group_for_user(self, user_fid: str) -> str | None:
+        """Get the group ID for a user's FID.
+        
+        This is a placeholder implementation. In a real system, you would:
+        1. Query the backend API to get user's groups
+        2. Use a mapping database
+        3. Or maintain a local cache of FID -> group mappings
+        
+        Args:
+            user_fid: Farcaster FID as string
+            
+        Returns:
+            Group ID if user is in a group, None otherwise
+        """
+        # Placeholder: Return a default group ID for testing
+        # In production, you'd query the backend API or database
+        try:
+            # Example: Query backend for user's groups
+            # response = requests.get(f"{self.backend_webhook_url.replace('/api/violations/webhook', '')}/api/users/{user_fid}/groups")
+            # if response.status_code == 200:
+            #     groups = response.json().get('groups', [])
+            #     return groups[0] if groups else None
+            
+            # For now, return a placeholder group ID
+            # You should implement proper group mapping based on your needs
+            return "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"  # Placeholder
+        except Exception as e:
+            print(f"Error getting group for user {user_fid}: {e}")
+            return None
     
     def monitor_user(self, fid: int, days: int = 7) -> int:
         """Monitor a specific user's casts for violations.
@@ -81,6 +157,7 @@ class FarcasterMonitor:
             
             for violated, rule_description in violations:
                 if violated:
+                    # Add to local database
                     if self.database.add_violation(
                         post_id=cast['post_id'],
                         author_id=cast['author_id'],
@@ -89,6 +166,19 @@ class FarcasterMonitor:
                         content=cast['content']
                     ):
                         violations_found += 1
+                        
+                        # Report to backend webhook (for group-specific functionality)
+                        # Note: You'll need to map FID to group membership
+                        # This is a placeholder - you'll need to implement group mapping
+                        group_id = self.get_group_for_user(str(cast['author_id']))
+                        if group_id:
+                            self.report_violation_to_backend(
+                                group_id=group_id,
+                                member_fid=str(cast['author_id']),
+                                rule_id=f"rule_{hash(rule_description) % 10000}",  # Generate rule ID
+                                violation_type=rule_description.split(':')[0] if ':' in rule_description else 'custom',
+                                evidence=cast['content'][:500]  # Truncate for webhook
+                            )
         
         print(f"\n--- Analysis Complete ---")
         print(f"New violations found: {violations_found}")

@@ -23,15 +23,95 @@ import type {
   TypedContractMethod,
 } from "../common";
 
+export declare namespace SwearJar {
+  export type GroupStruct = {
+    id: BytesLike;
+    name: string;
+    creator: AddressLike;
+    targetAmount: BigNumberish;
+    potBalance: BigNumberish;
+    memberCount: BigNumberish;
+    isActive: boolean;
+    createdAt: BigNumberish;
+    expiresAt: BigNumberish;
+  };
+
+  export type GroupStructOutput = [
+    id: string,
+    name: string,
+    creator: string,
+    targetAmount: bigint,
+    potBalance: bigint,
+    memberCount: bigint,
+    isActive: boolean,
+    createdAt: bigint,
+    expiresAt: bigint
+  ] & {
+    id: string;
+    name: string;
+    creator: string;
+    targetAmount: bigint;
+    potBalance: bigint;
+    memberCount: bigint;
+    isActive: boolean;
+    createdAt: bigint;
+    expiresAt: bigint;
+  };
+
+  export type MemberStruct = {
+    wallet: AddressLike;
+    bondAmount: BigNumberish;
+    isActive: boolean;
+    joinedAt: BigNumberish;
+  };
+
+  export type MemberStructOutput = [
+    wallet: string,
+    bondAmount: bigint,
+    isActive: boolean,
+    joinedAt: bigint
+  ] & {
+    wallet: string;
+    bondAmount: bigint;
+    isActive: boolean;
+    joinedAt: bigint;
+  };
+}
+
 export interface SwearJarInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "applyPenalty"
+      | "applyPenaltyToGroup"
       | "bonds"
+      | "createGroup"
+      | "deactivateGroup"
       | "depositBond"
+      | "depositBondToGroup"
+      | "distributeGroupPot"
+      | "getAllGroupIds"
       | "getBond"
+      | "getGroup"
+      | "getGroupBond"
+      | "getGroupMember"
+      | "getGroupMemberCount"
+      | "getGroupMembers"
+      | "getGroupPotBalance"
+      | "getGroupProgress"
       | "getNonce"
       | "getPotBalance"
+      | "getUserGroups"
+      | "groupBonds"
+      | "groupIds"
+      | "groupMemberList"
+      | "groupMembers"
+      | "groupNonces"
+      | "groupPots"
+      | "groups"
+      | "hasGroupReachedTarget"
+      | "isGroupMember"
+      | "joinGroup"
+      | "leaveGroup"
       | "nonces"
       | "owner"
       | "pause"
@@ -40,7 +120,10 @@ export interface SwearJarInterface extends Interface {
       | "renounceOwnership"
       | "transferOwnership"
       | "unpause"
+      | "userGroups"
       | "withdrawBond"
+      | "withdrawBondFromGroup"
+      | "withdrawGroupPot"
       | "withdrawPot"
   ): FunctionFragment;
 
@@ -48,6 +131,14 @@ export interface SwearJarInterface extends Interface {
     nameOrSignatureOrTopic:
       | "BondDeposited"
       | "BondWithdrawn"
+      | "GroupBondDeposited"
+      | "GroupBondWithdrawn"
+      | "GroupCreated"
+      | "GroupDeactivated"
+      | "GroupPenaltyApplied"
+      | "GroupPotWithdrawn"
+      | "MemberJoined"
+      | "MemberLeft"
       | "OwnershipTransferred"
       | "Paused"
       | "PotWithdrawn"
@@ -59,14 +150,63 @@ export interface SwearJarInterface extends Interface {
     functionFragment: "applyPenalty",
     values: [AddressLike, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "applyPenaltyToGroup",
+    values: [BytesLike, AddressLike, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "bonds", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "createGroup",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "deactivateGroup",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "depositBond",
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "depositBondToGroup",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "distributeGroupPot",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllGroupIds",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getBond",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "getGroup", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "getGroupBond",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGroupMember",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGroupMemberCount",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGroupMembers",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGroupPotBalance",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getGroupProgress",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getNonce",
@@ -75,6 +215,51 @@ export interface SwearJarInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getPotBalance",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getUserGroups",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "groupBonds",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "groupIds",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "groupMemberList",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "groupMembers",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "groupNonces",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "groupPots",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(functionFragment: "groups", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "hasGroupReachedTarget",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isGroupMember",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "joinGroup",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "leaveGroup",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -94,8 +279,20 @@ export interface SwearJarInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "userGroups",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "withdrawBond",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawBondFromGroup",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawGroupPot",
+    values: [BytesLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawPot",
@@ -106,17 +303,96 @@ export interface SwearJarInterface extends Interface {
     functionFragment: "applyPenalty",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "applyPenaltyToGroup",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "bonds", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "createGroup",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "deactivateGroup",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "depositBond",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "depositBondToGroup",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "distributeGroupPot",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllGroupIds",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getBond", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getGroup", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupBond",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupMember",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupMemberCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupMembers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupPotBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getGroupProgress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getPotBalance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getUserGroups",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "groupBonds", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "groupIds", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "groupMemberList",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "groupMembers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "groupNonces",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "groupPots", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "groups", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "hasGroupReachedTarget",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "isGroupMember",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "joinGroup", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "leaveGroup", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
@@ -131,8 +407,17 @@ export interface SwearJarInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "userGroups", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawBond",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawBondFromGroup",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawGroupPot",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -160,6 +445,154 @@ export namespace BondWithdrawnEvent {
   export interface OutputObject {
     user: string;
     amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GroupBondDepositedEvent {
+  export type InputTuple = [
+    groupId: BytesLike,
+    member: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [groupId: string, member: string, amount: bigint];
+  export interface OutputObject {
+    groupId: string;
+    member: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GroupBondWithdrawnEvent {
+  export type InputTuple = [
+    groupId: BytesLike,
+    member: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [groupId: string, member: string, amount: bigint];
+  export interface OutputObject {
+    groupId: string;
+    member: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GroupCreatedEvent {
+  export type InputTuple = [
+    groupId: BytesLike,
+    creator: AddressLike,
+    name: string,
+    targetAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    groupId: string,
+    creator: string,
+    name: string,
+    targetAmount: bigint
+  ];
+  export interface OutputObject {
+    groupId: string;
+    creator: string;
+    name: string;
+    targetAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GroupDeactivatedEvent {
+  export type InputTuple = [groupId: BytesLike];
+  export type OutputTuple = [groupId: string];
+  export interface OutputObject {
+    groupId: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GroupPenaltyAppliedEvent {
+  export type InputTuple = [
+    groupId: BytesLike,
+    member: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [groupId: string, member: string, amount: bigint];
+  export interface OutputObject {
+    groupId: string;
+    member: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GroupPotWithdrawnEvent {
+  export type InputTuple = [
+    groupId: BytesLike,
+    recipient: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [
+    groupId: string,
+    recipient: string,
+    amount: bigint
+  ];
+  export interface OutputObject {
+    groupId: string;
+    recipient: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MemberJoinedEvent {
+  export type InputTuple = [
+    groupId: BytesLike,
+    member: AddressLike,
+    bondAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    groupId: string,
+    member: string,
+    bondAmount: bigint
+  ];
+  export interface OutputObject {
+    groupId: string;
+    member: string;
+    bondAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MemberLeftEvent {
+  export type InputTuple = [groupId: BytesLike, member: AddressLike];
+  export type OutputTuple = [groupId: string, member: string];
+  export interface OutputObject {
+    groupId: string;
+    member: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -279,15 +712,166 @@ export interface SwearJar extends BaseContract {
     "nonpayable"
   >;
 
+  applyPenaltyToGroup: TypedContractMethod<
+    [groupId: BytesLike, user: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   bonds: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  createGroup: TypedContractMethod<
+    [name: string, targetAmount: BigNumberish, durationDays: BigNumberish],
+    [string],
+    "nonpayable"
+  >;
+
+  deactivateGroup: TypedContractMethod<
+    [groupId: BytesLike],
+    [void],
+    "nonpayable"
+  >;
 
   depositBond: TypedContractMethod<[], [void], "payable">;
 
+  depositBondToGroup: TypedContractMethod<
+    [groupId: BytesLike],
+    [void],
+    "payable"
+  >;
+
+  distributeGroupPot: TypedContractMethod<
+    [groupId: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  getAllGroupIds: TypedContractMethod<[], [string[]], "view">;
+
   getBond: TypedContractMethod<[user: AddressLike], [bigint], "view">;
+
+  getGroup: TypedContractMethod<
+    [groupId: BytesLike],
+    [SwearJar.GroupStructOutput],
+    "view"
+  >;
+
+  getGroupBond: TypedContractMethod<
+    [groupId: BytesLike, member: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  getGroupMember: TypedContractMethod<
+    [groupId: BytesLike, member: AddressLike],
+    [SwearJar.MemberStructOutput],
+    "view"
+  >;
+
+  getGroupMemberCount: TypedContractMethod<
+    [groupId: BytesLike],
+    [bigint],
+    "view"
+  >;
+
+  getGroupMembers: TypedContractMethod<
+    [groupId: BytesLike],
+    [string[]],
+    "view"
+  >;
+
+  getGroupPotBalance: TypedContractMethod<
+    [groupId: BytesLike],
+    [bigint],
+    "view"
+  >;
+
+  getGroupProgress: TypedContractMethod<[groupId: BytesLike], [bigint], "view">;
 
   getNonce: TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
   getPotBalance: TypedContractMethod<[], [bigint], "view">;
+
+  getUserGroups: TypedContractMethod<[user: AddressLike], [string[]], "view">;
+
+  groupBonds: TypedContractMethod<
+    [arg0: BytesLike, arg1: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  groupIds: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+
+  groupMemberList: TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
+
+  groupMembers: TypedContractMethod<
+    [arg0: BytesLike, arg1: AddressLike],
+    [
+      [string, bigint, boolean, bigint] & {
+        wallet: string;
+        bondAmount: bigint;
+        isActive: boolean;
+        joinedAt: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  groupNonces: TypedContractMethod<
+    [arg0: BytesLike, arg1: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  groupPots: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+
+  groups: TypedContractMethod<
+    [arg0: BytesLike],
+    [
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        boolean,
+        bigint,
+        bigint
+      ] & {
+        id: string;
+        name: string;
+        creator: string;
+        targetAmount: bigint;
+        potBalance: bigint;
+        memberCount: bigint;
+        isActive: boolean;
+        createdAt: bigint;
+        expiresAt: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  hasGroupReachedTarget: TypedContractMethod<
+    [groupId: BytesLike],
+    [boolean],
+    "view"
+  >;
+
+  isGroupMember: TypedContractMethod<
+    [groupId: BytesLike, user: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  joinGroup: TypedContractMethod<[groupId: BytesLike], [void], "payable">;
+
+  leaveGroup: TypedContractMethod<[groupId: BytesLike], [void], "nonpayable">;
 
   nonces: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
@@ -309,8 +893,26 @@ export interface SwearJar extends BaseContract {
 
   unpause: TypedContractMethod<[], [void], "nonpayable">;
 
+  userGroups: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
+
   withdrawBond: TypedContractMethod<
     [amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  withdrawBondFromGroup: TypedContractMethod<
+    [groupId: BytesLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  withdrawGroupPot: TypedContractMethod<
+    [groupId: BytesLike, to: AddressLike, amount: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -333,20 +935,168 @@ export interface SwearJar extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "applyPenaltyToGroup"
+  ): TypedContractMethod<
+    [groupId: BytesLike, user: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "bonds"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "createGroup"
+  ): TypedContractMethod<
+    [name: string, targetAmount: BigNumberish, durationDays: BigNumberish],
+    [string],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "deactivateGroup"
+  ): TypedContractMethod<[groupId: BytesLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "depositBond"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
+    nameOrSignature: "depositBondToGroup"
+  ): TypedContractMethod<[groupId: BytesLike], [void], "payable">;
+  getFunction(
+    nameOrSignature: "distributeGroupPot"
+  ): TypedContractMethod<[groupId: BytesLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "getAllGroupIds"
+  ): TypedContractMethod<[], [string[]], "view">;
+  getFunction(
     nameOrSignature: "getBond"
   ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getGroup"
+  ): TypedContractMethod<
+    [groupId: BytesLike],
+    [SwearJar.GroupStructOutput],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getGroupBond"
+  ): TypedContractMethod<
+    [groupId: BytesLike, member: AddressLike],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getGroupMember"
+  ): TypedContractMethod<
+    [groupId: BytesLike, member: AddressLike],
+    [SwearJar.MemberStructOutput],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getGroupMemberCount"
+  ): TypedContractMethod<[groupId: BytesLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getGroupMembers"
+  ): TypedContractMethod<[groupId: BytesLike], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "getGroupPotBalance"
+  ): TypedContractMethod<[groupId: BytesLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getGroupProgress"
+  ): TypedContractMethod<[groupId: BytesLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "getNonce"
   ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "getPotBalance"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getUserGroups"
+  ): TypedContractMethod<[user: AddressLike], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "groupBonds"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: AddressLike],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "groupIds"
+  ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "groupMemberList"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "groupMembers"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: AddressLike],
+    [
+      [string, bigint, boolean, bigint] & {
+        wallet: string;
+        bondAmount: bigint;
+        isActive: boolean;
+        joinedAt: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "groupNonces"
+  ): TypedContractMethod<
+    [arg0: BytesLike, arg1: AddressLike],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "groupPots"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "groups"
+  ): TypedContractMethod<
+    [arg0: BytesLike],
+    [
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        boolean,
+        bigint,
+        bigint
+      ] & {
+        id: string;
+        name: string;
+        creator: string;
+        targetAmount: bigint;
+        potBalance: bigint;
+        memberCount: bigint;
+        isActive: boolean;
+        createdAt: bigint;
+        expiresAt: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "hasGroupReachedTarget"
+  ): TypedContractMethod<[groupId: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isGroupMember"
+  ): TypedContractMethod<
+    [groupId: BytesLike, user: AddressLike],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "joinGroup"
+  ): TypedContractMethod<[groupId: BytesLike], [void], "payable">;
+  getFunction(
+    nameOrSignature: "leaveGroup"
+  ): TypedContractMethod<[groupId: BytesLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "nonces"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
@@ -372,8 +1122,29 @@ export interface SwearJar extends BaseContract {
     nameOrSignature: "unpause"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "userGroups"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "withdrawBond"
   ): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "withdrawBondFromGroup"
+  ): TypedContractMethod<
+    [groupId: BytesLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "withdrawGroupPot"
+  ): TypedContractMethod<
+    [groupId: BytesLike, to: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "withdrawPot"
   ): TypedContractMethod<
@@ -395,6 +1166,62 @@ export interface SwearJar extends BaseContract {
     BondWithdrawnEvent.InputTuple,
     BondWithdrawnEvent.OutputTuple,
     BondWithdrawnEvent.OutputObject
+  >;
+  getEvent(
+    key: "GroupBondDeposited"
+  ): TypedContractEvent<
+    GroupBondDepositedEvent.InputTuple,
+    GroupBondDepositedEvent.OutputTuple,
+    GroupBondDepositedEvent.OutputObject
+  >;
+  getEvent(
+    key: "GroupBondWithdrawn"
+  ): TypedContractEvent<
+    GroupBondWithdrawnEvent.InputTuple,
+    GroupBondWithdrawnEvent.OutputTuple,
+    GroupBondWithdrawnEvent.OutputObject
+  >;
+  getEvent(
+    key: "GroupCreated"
+  ): TypedContractEvent<
+    GroupCreatedEvent.InputTuple,
+    GroupCreatedEvent.OutputTuple,
+    GroupCreatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "GroupDeactivated"
+  ): TypedContractEvent<
+    GroupDeactivatedEvent.InputTuple,
+    GroupDeactivatedEvent.OutputTuple,
+    GroupDeactivatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "GroupPenaltyApplied"
+  ): TypedContractEvent<
+    GroupPenaltyAppliedEvent.InputTuple,
+    GroupPenaltyAppliedEvent.OutputTuple,
+    GroupPenaltyAppliedEvent.OutputObject
+  >;
+  getEvent(
+    key: "GroupPotWithdrawn"
+  ): TypedContractEvent<
+    GroupPotWithdrawnEvent.InputTuple,
+    GroupPotWithdrawnEvent.OutputTuple,
+    GroupPotWithdrawnEvent.OutputObject
+  >;
+  getEvent(
+    key: "MemberJoined"
+  ): TypedContractEvent<
+    MemberJoinedEvent.InputTuple,
+    MemberJoinedEvent.OutputTuple,
+    MemberJoinedEvent.OutputObject
+  >;
+  getEvent(
+    key: "MemberLeft"
+  ): TypedContractEvent<
+    MemberLeftEvent.InputTuple,
+    MemberLeftEvent.OutputTuple,
+    MemberLeftEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -453,6 +1280,94 @@ export interface SwearJar extends BaseContract {
       BondWithdrawnEvent.InputTuple,
       BondWithdrawnEvent.OutputTuple,
       BondWithdrawnEvent.OutputObject
+    >;
+
+    "GroupBondDeposited(bytes32,address,uint256)": TypedContractEvent<
+      GroupBondDepositedEvent.InputTuple,
+      GroupBondDepositedEvent.OutputTuple,
+      GroupBondDepositedEvent.OutputObject
+    >;
+    GroupBondDeposited: TypedContractEvent<
+      GroupBondDepositedEvent.InputTuple,
+      GroupBondDepositedEvent.OutputTuple,
+      GroupBondDepositedEvent.OutputObject
+    >;
+
+    "GroupBondWithdrawn(bytes32,address,uint256)": TypedContractEvent<
+      GroupBondWithdrawnEvent.InputTuple,
+      GroupBondWithdrawnEvent.OutputTuple,
+      GroupBondWithdrawnEvent.OutputObject
+    >;
+    GroupBondWithdrawn: TypedContractEvent<
+      GroupBondWithdrawnEvent.InputTuple,
+      GroupBondWithdrawnEvent.OutputTuple,
+      GroupBondWithdrawnEvent.OutputObject
+    >;
+
+    "GroupCreated(bytes32,address,string,uint256)": TypedContractEvent<
+      GroupCreatedEvent.InputTuple,
+      GroupCreatedEvent.OutputTuple,
+      GroupCreatedEvent.OutputObject
+    >;
+    GroupCreated: TypedContractEvent<
+      GroupCreatedEvent.InputTuple,
+      GroupCreatedEvent.OutputTuple,
+      GroupCreatedEvent.OutputObject
+    >;
+
+    "GroupDeactivated(bytes32)": TypedContractEvent<
+      GroupDeactivatedEvent.InputTuple,
+      GroupDeactivatedEvent.OutputTuple,
+      GroupDeactivatedEvent.OutputObject
+    >;
+    GroupDeactivated: TypedContractEvent<
+      GroupDeactivatedEvent.InputTuple,
+      GroupDeactivatedEvent.OutputTuple,
+      GroupDeactivatedEvent.OutputObject
+    >;
+
+    "GroupPenaltyApplied(bytes32,address,uint256)": TypedContractEvent<
+      GroupPenaltyAppliedEvent.InputTuple,
+      GroupPenaltyAppliedEvent.OutputTuple,
+      GroupPenaltyAppliedEvent.OutputObject
+    >;
+    GroupPenaltyApplied: TypedContractEvent<
+      GroupPenaltyAppliedEvent.InputTuple,
+      GroupPenaltyAppliedEvent.OutputTuple,
+      GroupPenaltyAppliedEvent.OutputObject
+    >;
+
+    "GroupPotWithdrawn(bytes32,address,uint256)": TypedContractEvent<
+      GroupPotWithdrawnEvent.InputTuple,
+      GroupPotWithdrawnEvent.OutputTuple,
+      GroupPotWithdrawnEvent.OutputObject
+    >;
+    GroupPotWithdrawn: TypedContractEvent<
+      GroupPotWithdrawnEvent.InputTuple,
+      GroupPotWithdrawnEvent.OutputTuple,
+      GroupPotWithdrawnEvent.OutputObject
+    >;
+
+    "MemberJoined(bytes32,address,uint256)": TypedContractEvent<
+      MemberJoinedEvent.InputTuple,
+      MemberJoinedEvent.OutputTuple,
+      MemberJoinedEvent.OutputObject
+    >;
+    MemberJoined: TypedContractEvent<
+      MemberJoinedEvent.InputTuple,
+      MemberJoinedEvent.OutputTuple,
+      MemberJoinedEvent.OutputObject
+    >;
+
+    "MemberLeft(bytes32,address)": TypedContractEvent<
+      MemberLeftEvent.InputTuple,
+      MemberLeftEvent.OutputTuple,
+      MemberLeftEvent.OutputObject
+    >;
+    MemberLeft: TypedContractEvent<
+      MemberLeftEvent.InputTuple,
+      MemberLeftEvent.OutputTuple,
+      MemberLeftEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
