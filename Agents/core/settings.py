@@ -36,3 +36,8 @@ def get_neynar_api_key() -> str:
 def get_database_path() -> str:
     """Returns the database file path."""
     return os.getenv("DATABASE_PATH", "violations.db")
+
+
+def get_backend_webhook_url() -> str | None:
+    """Returns the backend webhook URL if configured."""
+    return os.getenv("BACKEND_WEBHOOK_URL") or None

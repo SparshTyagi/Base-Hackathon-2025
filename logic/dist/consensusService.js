@@ -162,4 +162,28 @@ export class ConsensusService {
             throw new Error('Group not found');
         return buildWithdrawPotCalldata(this.jarConfig, proposal.recipient, proposal.amount);
     }
+    async initiateViolationVote(violationId, expiresInHours = 24) {
+        const violation = this.db.getViolationById(violationId);
+        if (!violation) {
+            throw new Error('Violation not found');
+        }
+        const rule = this.db.getRuleById(violation.ruleId);
+        if (!rule) {
+            throw new Error('Rule not found');
+        }
+        const group = this.db.getGroup(violation.groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        // Create a vote to approve the penalty
+        const proposalData = {
+            violationId: violation.id,
+            memberAddress: violation.memberAddress,
+            ruleId: violation.ruleId,
+            penaltyAmount: rule.penaltyAmount,
+            ruleName: rule.name
+        };
+        const vote = await this.groupService.createVote(violation.groupId, 'penalty_approval', proposalData, group.creatorAddress, expiresInHours);
+        return vote;
+    }
 }

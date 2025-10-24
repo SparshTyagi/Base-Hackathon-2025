@@ -32,6 +32,7 @@ import {
   type MemberInfo
 } from "./jar.js";
 import { SwearJarDatabase } from "./database-simple.js";
+import { SupabaseDatabase } from "./supabase-db.js";
 import { 
   GroupService, 
   CreateGroupRequest, 
@@ -54,11 +55,17 @@ const cfg: JarConfig = {
 
 const DEFAULT_KEY = process.env.DEFAULT_PRIVATE_KEY; // optional: used by /deposit and /withdraw if present
 
-// Initialize database and services
-const db = new SwearJarDatabase(process.env.DATABASE_PATH || './swearjar.db');
-const groupService = new GroupService(db, cfg);
+// Initialize database (use Supabase or in-memory based on env var)
+const DATABASE_TYPE = process.env.DATABASE_TYPE || 'memory';
+const db = DATABASE_TYPE === 'supabase' 
+  ? new SupabaseDatabase()
+  : new SwearJarDatabase(process.env.DATABASE_PATH || './swearjar.db');
+
+console.log(`Using ${DATABASE_TYPE} database`);
+
+const groupService = new GroupService(db as any, cfg);
 const notificationService = new NotificationService();
-const consensusService = new ConsensusService(db, groupService, notificationService, cfg);
+const consensusService = new ConsensusService(db as any, groupService, notificationService, cfg);
 
 // Register plugins
 app.register(import('@fastify/cors'), {
@@ -563,6 +570,52 @@ app.post("/violations", async (req, res) => {
   }
 });
 
+// Webhook endpoint for Python agents to report violations
+app.post("/api/violations/webhook", async (req, res) => {
+  try {
+    const { groupId, memberFid, memberAddress, ruleId, violationType, evidence, castHash, detectedAt } = req.body as any;
+    
+    if (!groupId || !ruleId || !evidence) {
+      return res.status(400).send({ ok: false, error: "groupId, ruleId, and evidence are required" });
+    }
+
+    // Use memberAddress if provided, otherwise use memberFid (you'll need to map FID to address)
+    const address = memberAddress || memberFid;
+    
+    if (!address) {
+      return res.status(400).send({ ok: false, error: "Either memberAddress or memberFid is required" });
+    }
+
+    const violation = await groupService.reportViolation({
+      groupId,
+      memberAddress: address,
+      ruleId,
+      message: `Violation detected: ${violationType}\nEvidence: ${evidence}\nCast: ${castHash || 'N/A'}`,
+      platform: 'farcaster'
+    });
+    
+    // Trigger automatic consensus vote for the violation
+    const vote = await consensusService.initiateViolationVote(violation.id);
+    
+    // Send real-time notifications
+    notificationService.notifyViolation(violation);
+    notificationService.notifyVoteCreated(vote);
+    
+    return { 
+      ok: true, 
+      violation,
+      vote,
+      message: "Violation reported and consensus vote initiated"
+    };
+  } catch (error) {
+    console.error('Webhook error:', error);
+    return res.status(400).send({ 
+      ok: false, 
+      error: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
 app.post("/violations/:id/apply-penalty", async (req, res) => {
   const { id } = req.params as any;
   const { privateKey } = req.body as any;
@@ -573,9 +626,9 @@ app.post("/violations/:id/apply-penalty", async (req, res) => {
     const result = await groupService.applyPenalty(id, privateKey);
     
     // Get violation details for notification
-    const violation = db.getViolationById(id);
+    const violation = await db.getViolationById(id);
     if (violation) {
-      notificationService.notifyPenaltyApplied(violation);
+      notificationService.notifyPenaltyApplied(violation as any);
     }
     
     return { ok: true, tx: result };

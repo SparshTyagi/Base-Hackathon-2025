@@ -1,5 +1,6 @@
 """Main entry point for the Farcaster monitoring application."""
 from monitor import FarcasterMonitor
+from core.settings import get_backend_webhook_url
 
 
 def main():
@@ -8,8 +9,9 @@ def main():
     print("   Farcaster Monitoring Agent")
     print("=" * 60)
     
-    # Initialize the monitor
-    monitor = FarcasterMonitor()
+    # Initialize the monitor with backend URL from environment
+    backend_url = get_backend_webhook_url()
+    monitor = FarcasterMonitor(backend_url=backend_url)
     
     # # Example: Configure user 1398613 with forbidden words
     # monitor.add_user_with_rules(
@@ -20,6 +22,9 @@ def main():
     # Example: Configure another user with LLM-based rules
     monitor.add_user_with_rules(
         user_id="1398613",
+        group_id="550e8400-e29b-41d4-a716-446655440000",  # Your test group UUID
+        rule_id="550e8400-e29b-41d4-a716-446655440001",   # Your test rule UUID
+        wallet_address="0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",  # User's wallet
         forbidden_words=["spam", "scam", "kinda", "dunno"],
         llm_rules=[
             {

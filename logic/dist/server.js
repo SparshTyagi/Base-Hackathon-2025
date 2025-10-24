@@ -4,6 +4,7 @@ import { readState, depositBond, withdrawBond, buildWithdrawPotCalldata, isAddre
 // Group-specific functions
 createGroup, joinGroup, leaveGroup, depositBondToGroup, withdrawBondFromGroup, applyPenaltyToGroup, withdrawGroupPot, distributeGroupPot, deactivateGroup, getGroup, getGroupMember, getGroupPotBalance, getGroupBond, getGroupMembers, getUserGroups, isGroupMember, getGroupMemberCount, hasGroupReachedTarget, getGroupProgress, getAllGroupIds } from "./jar.js";
 import { SwearJarDatabase } from "./database-simple.js";
+import { SupabaseDatabase } from "./supabase-db.js";
 import { GroupService, CreateGroupRequest, AddMemberRequest, CreateRuleRequest, ReportViolationRequest } from "./groupService.js";
 import { NotificationService } from "./notificationService.js";
 import { ConsensusService } from "./consensusService.js";
@@ -15,8 +16,12 @@ const cfg = {
     contract: (process.env.CONTRACT_ADDRESS || "0x19CF09A38Bd71BC5e7D5bFAd17EBd6A0269F2be9")
 };
 const DEFAULT_KEY = process.env.DEFAULT_PRIVATE_KEY; // optional: used by /deposit and /withdraw if present
-// Initialize database and services
-const db = new SwearJarDatabase(process.env.DATABASE_PATH || './swearjar.db');
+// Initialize database (use Supabase or in-memory based on env var)
+const DATABASE_TYPE = process.env.DATABASE_TYPE || 'memory';
+const db = DATABASE_TYPE === 'supabase'
+    ? new SupabaseDatabase()
+    : new SwearJarDatabase(process.env.DATABASE_PATH || './swearjar.db');
+console.log(`Using ${DATABASE_TYPE} database`);
 const groupService = new GroupService(db, cfg);
 const notificationService = new NotificationService();
 const consensusService = new ConsensusService(db, groupService, notificationService, cfg);
@@ -487,6 +492,45 @@ app.post("/violations", async (req, res) => {
         return res.status(400).send({ ok: false, error: error instanceof Error ? error.message : String(error) });
     }
 });
+// Webhook endpoint for Python agents to report violations
+app.post("/api/violations/webhook", async (req, res) => {
+    try {
+        const { groupId, memberFid, memberAddress, ruleId, violationType, evidence, castHash, detectedAt } = req.body;
+        if (!groupId || !ruleId || !evidence) {
+            return res.status(400).send({ ok: false, error: "groupId, ruleId, and evidence are required" });
+        }
+        // Use memberAddress if provided, otherwise use memberFid (you'll need to map FID to address)
+        const address = memberAddress || memberFid;
+        if (!address) {
+            return res.status(400).send({ ok: false, error: "Either memberAddress or memberFid is required" });
+        }
+        const violation = await groupService.reportViolation({
+            groupId,
+            memberAddress: address,
+            ruleId,
+            message: `Violation detected: ${violationType}\nEvidence: ${evidence}\nCast: ${castHash || 'N/A'}`,
+            platform: 'farcaster'
+        });
+        // Trigger automatic consensus vote for the violation
+        const vote = await consensusService.initiateViolationVote(violation.id);
+        // Send real-time notifications
+        notificationService.notifyViolation(violation);
+        notificationService.notifyVoteCreated(vote);
+        return {
+            ok: true,
+            violation,
+            vote,
+            message: "Violation reported and consensus vote initiated"
+        };
+    }
+    catch (error) {
+        console.error('Webhook error:', error);
+        return res.status(400).send({
+            ok: false,
+            error: error instanceof Error ? error.message : String(error)
+        });
+    }
+});
 app.post("/violations/:id/apply-penalty", async (req, res) => {
     const { id } = req.params;
     const { privateKey } = req.body;
@@ -495,7 +539,7 @@ app.post("/violations/:id/apply-penalty", async (req, res) => {
     try {
         const result = await groupService.applyPenalty(id, privateKey);
         // Get violation details for notification
-        const violation = db.getViolationById(id);
+        const violation = await db.getViolationById(id);
         if (violation) {
             notificationService.notifyPenaltyApplied(violation);
         }

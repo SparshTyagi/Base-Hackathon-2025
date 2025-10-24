@@ -116,3 +116,6 @@ next-env.d.ts
 # Python
 violations.db
 __pycache__
+
+.env
+logic/.env

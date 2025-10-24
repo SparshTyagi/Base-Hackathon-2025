@@ -50,4 +50,5 @@ export declare class ConsensusService {
         recentResults: VoteResult[];
     }>;
     buildPotDistributionCalldata(groupId: string, proposal: PotDistributionProposal): any;
+    initiateViolationVote(violationId: string, expiresInHours?: number): Promise<Vote>;
 }
