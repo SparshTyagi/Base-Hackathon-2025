@@ -33,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = "base" }) => {
           © {year} Piggy Protocol • Built for Base Mini Apps
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* <div className="flex items-center gap-3">
           <Pill tone="info" variant="soft">
             Primary: #0052FF
           </Pill>
@@ -43,7 +43,7 @@ export const Footer: React.FC<FooterProps> = ({ theme = "base" }) => {
           <Pill tone="success" variant="soft">
             Success: #00C48C
           </Pill>
-        </div>
+        </div> */}
       </div>
     </footer>
   );
